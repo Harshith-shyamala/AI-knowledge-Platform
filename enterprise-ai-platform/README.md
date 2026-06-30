@@ -122,17 +122,7 @@ Implemented Phase 1 capabilities:
 - chunk and embedding persistence
 - document indexing and chunk listing APIs
 
-## Next Engineering Milestone
 
-Milestone 6 should add hybrid retrieval and reranking:
-
-- tenant-scoped document search endpoint
-- lexical search over chunks
-- vector similarity adapter boundary
-- metadata filters
-- candidate merge and scoring
-- reranker strategy interface
-- citation-ready search results
 
 Suggested commit message:
 
