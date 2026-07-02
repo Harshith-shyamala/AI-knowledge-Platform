@@ -109,73 +109,127 @@ enterprise-ai-platform/
 
 ## Current Implementation Status
 
-Phase 0 through Phase 13 are complete with persistence, tenancy, authentication, RBAC, secure document upload, document indexing, hybrid retrieval, grounded RAG chat, agent orchestration, evaluation, observability, a Streamlit MVP UI, production deployment scaffolding, performance tooling, security review, and portfolio polish.
+Phase 0 through Phase 2 are complete. The platform now has a production-oriented backend foundation, database persistence, tenant-aware domain modeling, JWT authentication, and an RBAC-ready authorization boundary.
 
-Implemented Phase 1 capabilities:
+These first phases intentionally focus on the engineering foundation before adding RAG features. In an enterprise AI platform, document intelligence is only useful if the underlying system has clear service boundaries, reliable persistence, secure identity, tenant isolation, and testable authorization behavior.
+
+### Phase 1: Backend Foundation
+
+Phase 1 establishes the backend architecture for a maintainable FastAPI service that can support future document ingestion, retrieval, RAG, evaluation, and agent workflows.
+
+#### What Was Built
 
 - FastAPI app factory
-- typed settings
-- JSON structured logging
-- request ID middleware
-- error envelope
+- typed configuration and environment-based settings
+- JSON structured logging with request correlation
+- request ID middleware for traceability
+- standardized error envelope
 - health and readiness endpoints
-- application service container
-- tests
-- Dockerfile and Docker Compose
-- GitHub Actions CI workflow
+- application service container for dependency injection
 - SQLAlchemy persistence foundation
 - Alembic migration scaffold
+- PostgreSQL + pgvector Docker Compose service
+- Dockerfile and Docker Compose local runtime
+- GitHub Actions CI workflow
+- test coverage for application startup and health checks
+
+#### Engineering Capabilities Demonstrated
+
+- Clean application bootstrapping through an app factory instead of global framework state
+- Centralized configuration so local, CI, and production environments can be managed consistently
+- Structured logs and request IDs to make API behavior traceable across services
+- Standardized error responses for predictable client and frontend integration
+- Dependency-injection-friendly service container to avoid hard-coding infrastructure dependencies
+- Database and migration foundation ready for tenant, document, chunk, embedding, conversation, and audit entities
+- Dockerized local development environment with PostgreSQL and pgvector ready for future vector search
+- CI workflow foundation for repeatable validation before merging changes
+
+#### Why It Matters
+
+This phase turns the project from a script or demo into the beginning of a real backend platform. The focus is on operational readiness: configuration, observability, health checks, migrations, dependency boundaries, and repeatable local development.
+
+#### Validation
+
+- Health endpoint tests verify that the app starts correctly
+- Readiness behavior validates infrastructure connectivity boundaries
+- Application factory tests protect startup wiring
+- CI is prepared to run automated checks as the codebase grows
+
+### Phase 2: Identity, Tenancy, and RBAC
+
+Phase 2 adds the identity and access-control foundation required for a secure, multi-tenant enterprise AI platform.
+
+#### What Was Built
+
 - organization and workspace tenancy APIs
 - tenant-scoped workspace repository behavior
-- PostgreSQL + pgvector Docker Compose service
 - JWT registration, login, refresh, and current-user endpoints
 - password hashing with PBKDF2
-- organization memberships and RBAC permission checks
+- user, organization, and membership persistence models
+- role-based access control permission checks
 - cross-tenant authorization tests
-- secure document upload validation
-- local document storage adapter
-- document metadata and versioning
-- document upload/list/get/version APIs
-- upload authorization and cross-tenant document tests
-- text extraction for text-like uploads
-- text cleaning and fixed-window chunking
-- deterministic embedding gateway
-- chunk and embedding persistence
-- document indexing and chunk listing APIs
-- tenant-scoped hybrid search
-- lexical and vector scoring
-- score thresholding for noisy vector-only matches
-- citation-ready search results with document, version, and chunk IDs
-- chat, message, and citation persistence
-- grounded chat API over tenant-scoped retrieval
-- deterministic local answer generator behind an LLM gateway abstraction
-- conversation history and transcript APIs
-- deterministic agent workflow for planning, tool use, evidence inspection, reflection, and answer generation
-- agent run API with traceable steps, prompt version, workflow version, and citations
-- tenant-authorized agent runs over the same retrieval boundary as search and chat
-- evaluation runner over golden question examples
-- heuristic groundedness, faithfulness, answer relevance, and context recall evaluators
-- aggregate evaluation scores with evaluator versions and thresholds
-- evaluation metrics catalog API
-- Prometheus-style metrics endpoint
-- request count, latency sum, and latency max metrics
-- low-cardinality route-template metric labels
-- metrics middleware integrated with the FastAPI app factory
-- Streamlit MVP console under `frontend/`
-- login and registration workflow
-- organization and workspace context management
-- document upload, document listing, and indexing workflow
-- search, chat, agent, evaluation, and metrics views
-- Kubernetes manifests for namespace, config, secrets, API deployment, service, migration job, HPA, and demo Postgres
-- provider-neutral Terraform scaffold for deployment inputs, naming, and outputs
-- AWS Terraform scaffold for VPC, ECR, S3, RDS PostgreSQL, Secrets Manager, EKS, node groups, and IAM
-- production runbook for releases, migrations, smoke checks, rollback, and incidents
-- deployment validation script and CI-friendly deployment scaffold test
-- API load-test script for search, chat, agent, and evaluation workflows
-- security review covering tenant isolation, prompt injection, upload security, auth, secrets, and infrastructure
-- prompt-injection resilience test for citation-preserving agent behavior
-- portfolio case study, demo script, and interview guide
-- portfolio validation script and CI-friendly portfolio asset test
+
+#### Core Domain Model
+
+```text
+User
+  belongs to Organizations through Memberships
+
+Organization
+  owns Workspaces
+
+Workspace
+  becomes the security and retrieval boundary for future documents,
+  conversations, prompts, evaluations, and agents
+
+Membership
+  connects a user to an organization with a role
+```
+
+#### Security Capabilities Demonstrated
+
+- Passwords are stored using a one-way password hashing strategy
+- Login issues JWT access tokens instead of storing server-side session state
+- Current-user endpoint validates token-based identity
+- Organization membership controls access to tenant-owned resources
+- Repository behavior is tenant scoped to prevent accidental cross-organization reads
+- RBAC checks create a reusable authorization boundary for future upload, search, chat, admin, and agent actions
+
+#### Why It Matters
+
+Enterprise AI systems handle sensitive company knowledge. Before adding document upload or retrieval, the platform must answer a more fundamental question: who is allowed to access which organization, workspace, document, and AI capability?
+
+Phase 2 creates the foundation for secure multi-tenancy so later RAG features can be built on top of organization and workspace boundaries instead of retrofitting security after the fact.
+
+#### Validation
+
+- Authentication tests cover registration, login, token refresh, and current-user behavior
+- Authorization tests verify role-based permission checks
+- Cross-tenant tests confirm that users cannot access resources outside their organization
+- Repository tests validate tenant-scoped data access patterns
+
+### Current Platform Foundation
+
+After Phase 1 and Phase 2, the platform can support:
+
+- production-style FastAPI service structure
+- database-backed organizations, users, memberships, and workspaces
+- JWT-based authentication flow
+- RBAC-ready permission checks
+- tenant-scoped repository access
+- Dockerized local development with PostgreSQL and pgvector
+- CI-ready backend validation
+
+## Next Engineering Milestone
+
+Phase 3 will introduce secure document upload and knowledge management:
+
+- file validation and upload authorization
+- local storage adapter with S3-compatible abstraction
+- document metadata persistence
+- document versioning
+- tenant-scoped document APIs
+- cross-tenant document access tests
 
 ## Future Upgrades
 
@@ -189,5 +243,5 @@ Implemented Phase 1 capabilities:
 Suggested commit message:
 
 ```text
-docs: add final portfolio case study and demo guide
+docs: document phase 1 and phase 2 platform foundation
 ```
