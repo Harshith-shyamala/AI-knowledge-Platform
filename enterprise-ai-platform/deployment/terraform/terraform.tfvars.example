@@ -1,0 +1,7 @@
+project_name   = "enterprise-ai-platform"
+environment    = "dev"
+container_image = "ghcr.io/your-org/enterprise-ai-platform-api:latest"
+namespace      = "eakp"
+
+database_url   = "postgresql+psycopg://eakp:replace-me@db.example.com:5432/eakp"
+jwt_secret_key = "replace-with-at-least-32-random-characters"

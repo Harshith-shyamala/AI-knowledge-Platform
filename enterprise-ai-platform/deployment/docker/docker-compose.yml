@@ -1,0 +1,45 @@
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: deployment/docker/Dockerfile.api
+    environment:
+      EAKP_ENVIRONMENT: local
+      EAKP_SERVICE_NAME: enterprise-ai-platform-api
+      EAKP_LOG_LEVEL: INFO
+      EAKP_DATABASE_URL: postgresql+psycopg://eakp:eakp@postgres:5432/eakp
+      EAKP_AUTO_CREATE_SCHEMA: "true"
+      EAKP_JWT_SECRET_KEY: local-compose-change-me-local-compose-change-me
+      EAKP_STORAGE_ROOT: .local/storage
+      EAKP_MAX_UPLOAD_SIZE_BYTES: "26214400"
+      EAKP_READINESS_DEPENDENCIES_ENABLED: "false"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/live', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: eakp
+      POSTGRES_USER: eakp
+      POSTGRES_PASSWORD: eakp
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eakp -d eakp"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  postgres-data:

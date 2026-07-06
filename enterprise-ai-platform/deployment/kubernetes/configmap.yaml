@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eakp-api-config
+  namespace: eakp
+  labels:
+    app.kubernetes.io/name: enterprise-ai-platform-api
+data:
+  EAKP_ENVIRONMENT: "production"
+  EAKP_SERVICE_NAME: "enterprise-ai-platform-api"
+  EAKP_LOG_LEVEL: "INFO"
+  EAKP_AUTO_CREATE_SCHEMA: "false"
+  EAKP_STORAGE_ROOT: "/var/lib/eakp/storage"
+  EAKP_MAX_UPLOAD_SIZE_BYTES: "26214400"
+  EAKP_READINESS_DEPENDENCIES_ENABLED: "true"

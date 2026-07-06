@@ -1,0 +1,14 @@
+aws_region          = "us-east-1"
+project_name        = "enterprise-ai-platform"
+environment         = "dev"
+availability_zones  = ["us-east-1a", "us-east-1b"]
+database_name       = "eakp"
+database_username   = "eakp"
+database_password   = "replace-with-a-strong-password"
+jwt_secret_key      = "replace-with-at-least-32-random-characters"
+api_image_tag       = "latest"
+eks_cluster_version = "1.30"
+node_instance_types = ["t3.medium"]
+node_desired_size   = 2
+node_min_size       = 1
+node_max_size       = 4
