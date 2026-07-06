@@ -1,247 +1,258 @@
 # Enterprise AI Knowledge Platform
 
-Enterprise AI Knowledge Platform (EAKP) is a production-grade portfolio project blueprint for a secure, multi-tenant knowledge intelligence platform. It is designed to demonstrate enterprise AI engineering across document ingestion, RAG, hybrid retrieval, agent orchestration, evaluation, observability, and cloud-ready deployment.
+Enterprise AI Knowledge Platform (EAKP) is a production-style portfolio project that models how an
+internal enterprise knowledge assistant should be built: multi-tenant by default, grounded in indexed
+documents, measurable, observable, and prepared for cloud deployment.
 
-This repository area is intentionally starting with Phase 0: architecture, contracts, roadmap, and operating model. The implementation should proceed milestone by milestone so each phase remains independently runnable, reviewable, and defensible in a senior engineering interview.
+The platform lets users upload documents into an organization workspace, index them, search across
+the indexed knowledge, ask grounded questions, run a deterministic agent workflow, evaluate answer
+quality, and inspect service metrics.
 
-## Product Vision
+## Highlights
 
-EAKP enables organizations to upload enterprise knowledge and ask natural language questions over it with grounded answers, citations, access controls, and operational telemetry.
+- FastAPI backend with clean application, domain, infrastructure, and API boundaries
+- Streamlit console for document upload, search, chat, agent runs, evaluation, and metrics
+- Organization/workspace tenancy model
+- JWT authentication with role-based permission checks
+- Tenant-scoped repositories and cross-tenant access tests
+- Document upload validation, safe filename handling, versioning, and local storage adapter
+- Text extraction, fixed-window chunking, deterministic local embeddings, and indexed chunks
+- Hybrid search with lexical and vector scoring
+- Grounded chat with citations and question-specific extractive answers
+- Deterministic agent workflow with plan, retrieval, evidence inspection, grounding reflection, and final answer
+- Evaluation framework for groundedness, faithfulness, answer relevance, and context recall
+- Prometheus-style metrics, health checks, readiness checks, structured logging, and request IDs
+- Docker, Docker Compose, Kubernetes, and Terraform AWS deployment scaffolding
+- Portfolio documentation, demo script, security review, runbook, and performance plan
 
-The platform is modeled after internal enterprise AI systems such as Microsoft Copilot, Glean, Notion AI, Atlassian Intelligence, and ChatGPT Enterprise, while keeping implementation choices explicit and portfolio-friendly.
-
-## Audience
-
-- Recruiters: polished repository, clear README, professional roadmap, demo-ready story.
-- Hiring managers: deployable architecture, clear milestones, cloud and security posture.
-- Senior engineers: clean architecture, SOLID boundaries, tests, dependency inversion.
-- ML engineers: RAG, hybrid retrieval, reranking, evaluation, prompt/version management.
-- DevOps engineers: Docker, Kubernetes readiness, Terraform readiness, CI/CD, monitoring.
-
-## Phase 0 Deliverables
-
-- [Architecture overview](docs/architecture/architecture.md)
-- [Data model and tenancy design](docs/architecture/data-model.md)
-- [API contract](docs/api/api-contract.md)
-- [Sequence diagrams](docs/architecture/sequences.md)
-- [Deployment and scaling strategy](docs/operations/deployment-scaling.md)
-- [Security architecture](docs/security/security-architecture.md)
-- [Milestone roadmap](docs/roadmap/milestones.md)
-
-## Target Technology Stack
-
-- Python 3.12+
-- FastAPI
-- SQLAlchemy 2.x
-- Alembic
-- PostgreSQL
-- pgvector
-- Redis
-- Celery or Dramatiq
-- LangGraph for agent orchestration
-- OpenAI embeddings and LLMs behind provider abstractions
-- Streamlit MVP UI, React/Next.js later
-- Docker, Docker Compose, Kubernetes, Terraform
-- Prometheus, Grafana, OpenTelemetry, Jaeger, Loki
-- Pytest, Ruff, MyPy, pre-commit, GitHub Actions
-
-## Clean Architecture Boundary
+## Architecture
 
 ```text
-Presentation Layer
-  FastAPI routers, Streamlit UI, API schemas
+Presentation
+  FastAPI routers, Pydantic schemas, Streamlit UI
 
-Application Layer
-  Use cases, commands, queries, orchestration, policies
+Application
+  Use cases, commands, authorization checks, chat, retrieval, agents, evaluation
 
-Domain Layer
-  Entities, value objects, domain services, events
+Domain
+  Users, organizations, workspaces, documents, versions, chunks, embeddings, conversations, citations
 
-Infrastructure Layer
-  SQLAlchemy, pgvector, Redis, object storage, LLM providers, queues
+Infrastructure
+  SQLAlchemy repositories, unit of work, Alembic migrations, local storage, deployment adapters
 ```
 
-Business logic must live in the application and domain layers, not in API routes, ORM models, or UI components.
+The project keeps business logic out of framework routes and ORM models. API routes translate HTTP
+requests into application commands. Application services enforce permissions and coordinate
+repositories through a unit-of-work boundary.
 
-## Local Demo
+## Core User Flow
 
-Run the FastAPI backend:
+1. Register or log in.
+2. Select an organization and workspace.
+3. Upload a document such as a vendor security policy.
+4. Index the document into chunks and embeddings.
+5. Search the workspace knowledge.
+6. Ask grounded chat questions and inspect citations.
+7. Run the agent workflow for traceable reasoning steps.
+8. Run evaluation examples and inspect quality scores.
+9. Check service metrics and health endpoints.
 
-```bash
-cd backend
-. .venv/bin/activate
-uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
+Example questions for the included vendor policy demo:
 
-Run the Streamlit console:
+- `What evidence is required before vendor onboarding?`
+- `How quickly must security incidents be reported?`
+- `Can AI tools process confidential customer data?`
+- `Summarize the vendor security policy.`
 
-```bash
-. backend/.venv/bin/activate
-pip install -r frontend/requirements.txt
-streamlit run frontend/app.py
-```
+## Technology Stack
 
-- API docs: `http://127.0.0.1:8000/docs`
-- Streamlit UI: `http://127.0.0.1:8501`
+- Python, FastAPI, Pydantic, SQLAlchemy, Alembic
+- SQLite for local demo and PostgreSQL/pgvector deployment scaffolding
+- Deterministic local embedding gateway for repeatable tests
+- Streamlit MVP console
+- Pytest, pytest-cov, Ruff, MyPy
+- Docker and Docker Compose
+- Kubernetes manifests with health probes, resource requests, HPA, and migration job
+- Terraform generic scaffold and AWS scaffold for VPC, ECR, S3, RDS, Secrets Manager, IAM, and EKS
 
-## Initial Project Shape
+## Repository Structure
 
 ```text
 enterprise-ai-platform/
   backend/
     app/
+      api/
+      application/
+      core/
+      domain/
+      infrastructure/
+      schemas/
+    alembic/
     tests/
   frontend/
-  docs/
-    api/
-    architecture/
-    operations/
-    roadmap/
-    security/
+    app.py
   deployment/
     docker/
     kubernetes/
     terraform/
+  docs/
+    api/
+    architecture/
+    operations/
+    portfolio/
+    roadmap/
+    security/
   scripts/
-  .github/
-    workflows/
 ```
 
-## Current Implementation Status
+## Run Locally
 
-Phase 0 through Phase 2 are complete. The platform now has a production-oriented backend foundation, database persistence, tenant-aware domain modeling, JWT authentication, and an RBAC-ready authorization boundary.
+Start the API:
 
-These first phases intentionally focus on the engineering foundation before adding RAG features. In an enterprise AI platform, document intelligence is only useful if the underlying system has clear service boundaries, reliable persistence, secure identity, tenant isolation, and testable authorization behavior.
-
-### Phase 1: Backend Foundation
-
-Phase 1 establishes the backend architecture for a maintainable FastAPI service that can support future document ingestion, retrieval, RAG, evaluation, and agent workflows.
-
-#### What Was Built
-
-- FastAPI app factory
-- typed configuration and environment-based settings
-- JSON structured logging with request correlation
-- request ID middleware for traceability
-- standardized error envelope
-- health and readiness endpoints
-- application service container for dependency injection
-- SQLAlchemy persistence foundation
-- Alembic migration scaffold
-- PostgreSQL + pgvector Docker Compose service
-- Dockerfile and Docker Compose local runtime
-- GitHub Actions CI workflow
-- test coverage for application startup and health checks
-
-#### Engineering Capabilities Demonstrated
-
-- Clean application bootstrapping through an app factory instead of global framework state
-- Centralized configuration so local, CI, and production environments can be managed consistently
-- Structured logs and request IDs to make API behavior traceable across services
-- Standardized error responses for predictable client and frontend integration
-- Dependency-injection-friendly service container to avoid hard-coding infrastructure dependencies
-- Database and migration foundation ready for tenant, document, chunk, embedding, conversation, and audit entities
-- Dockerized local development environment with PostgreSQL and pgvector ready for future vector search
-- CI workflow foundation for repeatable validation before merging changes
-
-#### Why It Matters
-
-This phase turns the project from a script or demo into the beginning of a real backend platform. The focus is on operational readiness: configuration, observability, health checks, migrations, dependency boundaries, and repeatable local development.
-
-#### Validation
-
-- Health endpoint tests verify that the app starts correctly
-- Readiness behavior validates infrastructure connectivity boundaries
-- Application factory tests protect startup wiring
-- CI is prepared to run automated checks as the codebase grows
-
-### Phase 2: Identity, Tenancy, and RBAC
-
-Phase 2 adds the identity and access-control foundation required for a secure, multi-tenant enterprise AI platform.
-
-#### What Was Built
-
-- organization and workspace tenancy APIs
-- tenant-scoped workspace repository behavior
-- JWT registration, login, refresh, and current-user endpoints
-- password hashing with PBKDF2
-- user, organization, and membership persistence models
-- role-based access control permission checks
-- cross-tenant authorization tests
-
-#### Core Domain Model
-
-```text
-User
-  belongs to Organizations through Memberships
-
-Organization
-  owns Workspaces
-
-Workspace
-  becomes the security and retrieval boundary for future documents,
-  conversations, prompts, evaluations, and agents
-
-Membership
-  connects a user to an organization with a role
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-#### Security Capabilities Demonstrated
+Start the Streamlit console from the project root:
 
-- Passwords are stored using a one-way password hashing strategy
-- Login issues JWT access tokens instead of storing server-side session state
-- Current-user endpoint validates token-based identity
-- Organization membership controls access to tenant-owned resources
-- Repository behavior is tenant scoped to prevent accidental cross-organization reads
-- RBAC checks create a reusable authorization boundary for future upload, search, chat, admin, and agent actions
-
-#### Why It Matters
-
-Enterprise AI systems handle sensitive company knowledge. Before adding document upload or retrieval, the platform must answer a more fundamental question: who is allowed to access which organization, workspace, document, and AI capability?
-
-Phase 2 creates the foundation for secure multi-tenancy so later RAG features can be built on top of organization and workspace boundaries instead of retrofitting security after the fact.
-
-#### Validation
-
-- Authentication tests cover registration, login, token refresh, and current-user behavior
-- Authorization tests verify role-based permission checks
-- Cross-tenant tests confirm that users cannot access resources outside their organization
-- Repository tests validate tenant-scoped data access patterns
-
-### Current Platform Foundation
-
-After Phase 1 and Phase 2, the platform can support:
-
-- production-style FastAPI service structure
-- database-backed organizations, users, memberships, and workspaces
-- JWT-based authentication flow
-- RBAC-ready permission checks
-- tenant-scoped repository access
-- Dockerized local development with PostgreSQL and pgvector
-- CI-ready backend validation
-
-## Next Engineering Milestone
-
-Phase 3 will introduce secure document upload and knowledge management:
-
-- file validation and upload authorization
-- local storage adapter with S3-compatible abstraction
-- document metadata persistence
-- document versioning
-- tenant-scoped document APIs
-- cross-tenant document access tests
-
-## Future Upgrades
-
-- replace deterministic local model gateways with OpenAI or Azure AI adapters
-- move indexing and evaluation to queue workers
-- add OpenTelemetry traces and Grafana dashboards
-- add remote Terraform state and encrypted secret delivery
-- add full prompt-injection fixture suite and container/dependency scans
-- add React/Next.js production UI
-
-Suggested commit message:
-
-```text
-docs: document phase 1 and phase 2 platform foundation
+```bash
+source backend/.venv/bin/activate
+pip install -r frontend/requirements.txt
+streamlit run frontend/app.py
 ```
+
+Open:
+
+- API docs: `http://127.0.0.1:8000/docs`
+- API health: `http://127.0.0.1:8000/health/live`
+- Streamlit console: `http://127.0.0.1:8501`
+
+Default demo credentials in the UI:
+
+- Email: `demo@example.com`
+- Password: `correct horse battery staple`
+
+If the demo user does not exist yet, use the Register tab.
+
+## Validation
+
+Core checks:
+
+```bash
+cd backend
+source .venv/bin/activate
+ruff check .
+mypy app tests
+pytest --cov=app --cov-report=term-missing
+```
+
+Deployment and portfolio checks:
+
+```bash
+cd ..
+source backend/.venv/bin/activate
+python scripts/validate_deployment.py
+python scripts/validate_portfolio.py
+kubectl kustomize deployment/kubernetes
+terraform -chdir=deployment/terraform init -backend=false
+terraform -chdir=deployment/terraform validate
+terraform -chdir=deployment/terraform/aws init -backend=false
+terraform -chdir=deployment/terraform/aws validate
+```
+
+Load smoke against a running API:
+
+```bash
+source backend/.venv/bin/activate
+python scripts/load_test_api.py --iterations 10 --email-prefix demo-load
+```
+
+Recent local readiness results:
+
+- `ruff check .` passed
+- `mypy app tests` passed
+- `pytest --cov=app` passed with 41 tests and 93% coverage
+- Alembic migrations upgraded to head
+- API health, readiness, metrics, Streamlit health passed
+- End-to-end user flow passed: register, workspace, upload, index, search, chat, agent, evaluation
+- Kubernetes render passed
+- Terraform validate passed for generic and AWS scaffolds
+- Docker Compose config passed
+
+## Deployment Notes
+
+Docker:
+
+```bash
+docker compose -f deployment/docker/docker-compose.yml up --build
+```
+
+Kubernetes:
+
+```bash
+kubectl apply -k deployment/kubernetes
+```
+
+Terraform AWS scaffold:
+
+```bash
+cd deployment/terraform/aws
+cp terraform.tfvars.example terraform.tfvars
+terraform init
+terraform plan
+```
+
+Before deploying for real users, provide real secrets, configure AWS credentials, replace placeholder
+container image names, run Docker image build/container smoke, and complete dependency/security audit
+remediation.
+
+## Documentation
+
+- [Architecture](docs/architecture/architecture.md)
+- [Data model](docs/architecture/data-model.md)
+- [API contract](docs/api/api-contract.md)
+- [Sequence diagrams](docs/architecture/sequences.md)
+- [Security architecture](docs/security/security-architecture.md)
+- [Security review](docs/security/security-review.md)
+- [Production runbook](docs/operations/production-runbook.md)
+- [Performance plan](docs/operations/performance-plan.md)
+- [Demo script](docs/portfolio/demo-script.md)
+- [Case study](docs/portfolio/case-study.md)
+- [Interview guide](docs/portfolio/interview-guide.md)
+- [Milestone roadmap](docs/roadmap/milestones.md)
+
+## Interview Positioning
+
+Short pitch:
+
+> I built a multi-tenant enterprise AI knowledge platform with secure upload, indexing, hybrid
+> retrieval, grounded chat, deterministic agent workflows, evaluation metrics, observability, and
+> deployment scaffolding across Docker, Kubernetes, and Terraform.
+
+What to emphasize:
+
+- Enterprise architecture, not just prompt engineering
+- Tenant isolation and authorization before RAG
+- Repeatable local embeddings for deterministic tests
+- Grounded answers with citations and evaluation scores
+- Operational readiness through health, readiness, metrics, migrations, and deployment manifests
+- Honest production readiness assessment with known remaining gaps
+
+## Production Readiness Status
+
+Demo and portfolio ready.
+
+Not yet production-ready for real users until these items are complete:
+
+- Resolve dependency audit findings as upstream fixed versions become available
+- Run Docker image build and container smoke with Docker Desktop/daemon running
+- Run AWS `terraform plan` with valid credentials and target account permissions
+- Replace placeholder Kubernetes secrets and image references
+- Add persistent object storage and production database backups
+- Add external LLM/embedding provider adapter if replacing deterministic local embeddings
+- Add CI workflow at repository root if this nested project layout remains
+
