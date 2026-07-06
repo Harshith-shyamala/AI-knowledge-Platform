@@ -222,25 +222,7 @@ remediation.
 - [Performance plan](docs/operations/performance-plan.md)
 - [Demo script](docs/portfolio/demo-script.md)
 - [Case study](docs/portfolio/case-study.md)
-- [Interview guide](docs/portfolio/interview-guide.md)
 - [Milestone roadmap](docs/roadmap/milestones.md)
-
-## Interview Positioning
-
-Short pitch:
-
-> I built a multi-tenant enterprise AI knowledge platform with secure upload, indexing, hybrid
-> retrieval, grounded chat, deterministic agent workflows, evaluation metrics, observability, and
-> deployment scaffolding across Docker, Kubernetes, and Terraform.
-
-What to emphasize:
-
-- Enterprise architecture, not just prompt engineering
-- Tenant isolation and authorization before RAG
-- Repeatable local embeddings for deterministic tests
-- Grounded answers with citations and evaluation scores
-- Operational readiness through health, readiness, metrics, migrations, and deployment manifests
-- Honest production readiness assessment with known remaining gaps
 
 ## Production Readiness Status
 
@@ -255,4 +237,3 @@ Not yet production-ready for real users until these items are complete:
 - Add persistent object storage and production database backups
 - Add external LLM/embedding provider adapter if replacing deterministic local embeddings
 - Add CI workflow at repository root if this nested project layout remains
-

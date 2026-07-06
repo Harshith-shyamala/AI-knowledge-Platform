@@ -43,14 +43,5 @@ streamlit run frontend/app.py
 - API docs: `http://127.0.0.1:8000/docs`
 - Streamlit console: `http://127.0.0.1:8501`
 
-## Interview Story
-
-This project is designed to be presented as an enterprise AI platform rather than a simple chatbot:
-
-> I built a multi-tenant knowledge platform where organizations can upload internal documents,
-> index them, search them, ask grounded questions, run agent workflows, evaluate answer quality,
-> observe service metrics, and deploy through Docker, Kubernetes, and Terraform.
-
 See the full project README:
 [`enterprise-ai-platform/README.md`](enterprise-ai-platform/README.md)
-
